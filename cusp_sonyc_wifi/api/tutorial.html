@@ -1,0 +1,501 @@
+
+
+<!doctype html>
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>How to Use Wifi-pulling APIs &mdash; Wifi-pulling API 1.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/bizstyle.js"></script>
+    <link rel="top" title="Wifi-pulling API 1.0.0 documentation" href="index.html" />
+    <link rel="next" title="Code Documentation" href="code.html" />
+    <link rel="prev" title="Welcome to Wifi-pulling API’s documentation!" href="index.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="code.html" title="Code Documentation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Wifi-pulling API’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Wifi-pulling API 1.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">How to Use Wifi-pulling APIs</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#wifi-pulling-apis">Wifi-pulling APIs</a><ul>
+<li><a class="reference internal" href="#batch-and-offset">batch and offset</a></li>
+<li><a class="reference internal" href="#columns">columns</a></li>
+<li><a class="reference internal" href="#distinct">distinct</a></li>
+<li><a class="reference internal" href="#timeformat">timeformat</a></li>
+<li><a class="reference internal" href="#idx">idx</a></li>
+<li><a class="reference internal" href="#acc">acc</a></li>
+<li><a class="reference internal" href="#altitude">altitude</a></li>
+<li><a class="reference internal" href="#startdate-and-enddate">startdate and enddate</a></li>
+<li><a class="reference internal" href="#device-mac">device_mac</a></li>
+<li><a class="reference internal" href="#app-version">app_version</a></li>
+<li><a class="reference internal" href="#droid-version">droid_version</a></li>
+<li><a class="reference internal" href="#device-model">device_model</a></li>
+<li><a class="reference internal" href="#ssid">ssid</a></li>
+<li><a class="reference internal" href="#bssid">bssid</a></li>
+<li><a class="reference internal" href="#caps">caps</a></li>
+<li><a class="reference internal" href="#level">level</a></li>
+<li><a class="reference internal" href="#freq">freq</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to Wifi-pulling API&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="code.html"
+                        title="next chapter">Code Documentation</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/tutorial.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="how-to-use-wifi-pulling-apis">
+<h1>How to Use Wifi-pulling APIs<a class="headerlink" href="#how-to-use-wifi-pulling-apis" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>It is straightforward to use Wifi-pulling APIs, the portal to query wifi_scan database. In general, utilizing URL and GET, simply put parameter-value pair(s) on URL to perform data retrieval to get JSON object as the return.</p>
+<p>Have a look at an <strong>example</strong> of how to use APIs:</p>
+<div class="highlight-python"><div class="highlight"><pre>http://capstone.cloudapp.net/wifipulling/?columns=lat|lng|ssid|time&amp;ssid=nyu&amp;startdate=12/2/2014&amp;batch=5&amp;timeformat=1
+</pre></div>
+</div>
+<dl class="docutils">
+<dt>Explaination:</dt>
+<dd><ul class="first last simple">
+<li>capstone.cloudapp.net: the webserver hosting wifipulling project</li>
+<li>wifipulling: the Django project serving data pulling</li>
+<li>Following &#8216;?&#8217; are specified parameter-value pairs for data retrieval. See below &#8220;Wifi-pulling APIs&#8221; section for more details.</li>
+</ul>
+</dd>
+</dl>
+<p>The returned <strong>JSON</strong> object:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[{</span><span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.69364759</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.98628902</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="s">&quot;12-02-2014 17:33:10&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.69364761</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.98628901</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="s">&quot;12-02-2014 17:33:11&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.69364761</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.98628901</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="s">&quot;12-02-2014 17:33:13&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.69364761</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.98628901</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="s">&quot;12-02-2014 17:33:14&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.69364759</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.98628902</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="s">&quot;12-02-2014 17:33:15&quot;</span><span class="p">}]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="wifi-pulling-apis">
+<h2>Wifi-pulling APIs<a class="headerlink" href="#wifi-pulling-apis" title="Permalink to this headline">¶</a></h2>
+<p>APIs are used to retrieve data from wifi_scan database. APIs similar to SQL queries are provided to query, and JSON object is returned as the output. The commonly used APIs include, but not limited to, <strong>batch</strong>, <strong>offset</strong>, <strong>columns</strong>, <strong>distinct</strong>, <strong>timeformat</strong>, <strong>ssid</strong>, <strong>startdate</strong> and <strong>enddate</strong>. Here are detailed explanations of how to use APIs.</p>
+<div class="section" id="batch-and-offset">
+<h3>batch and offset<a class="headerlink" href="#batch-and-offset" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>batch: to specify how many data entries to retrieve</li>
+<li>offest:  to specify at which location to start retrieval</li>
+</ul>
+<p><em>Example</em></p>
+<div class="highlight-python"><div class="highlight"><pre>http://capstone.cloudapp.net/wifipulling/?batch=3&amp;offest=75
+</pre></div>
+</div>
+<p><em>Output</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">25.111</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">494</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">72.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;Nexus 4&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.2.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:ec:9f&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1416430302546</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.692743</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.9862441</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.5&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;40:b0:fa:c4:5d:5f&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">5180.0</span><span class="p">},</span>
+<span class="p">{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">25.111</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">495</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">74.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;Nexus 4&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.2.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:f2:4f&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1416430302546</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.692743</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.9862441</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.5&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;40:b0:fa:c4:5d:5f&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">5805.0</span><span class="p">},</span>
+<span class="p">{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">25.111</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">496</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">78.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;Nexus 4&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.2.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:5c:04:bf&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1416430302546</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.692743</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.9862441</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.5&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;40:b0:fa:c4:5d:5f&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">5220.0</span><span class="p">}]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>If neither batch and nor offset is specified, return all queried results from database</li>
+<li>If offset is specified, but batch not specified, batch is by default 10</li>
+<li>If batch is specified, but offset not specified, offset is by default 0</li>
+<li>The bigger the batch is, the longer time is needed to return results</li>
+</ul>
+</div>
+</div>
+<div class="section" id="columns">
+<h3>columns<a class="headerlink" href="#columns" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>columns: to specify what column(s) to retrieve. Available columns (attributes) are <strong>idx</strong>, <strong>lat</strong>, <strong>lng</strong>, <strong>acc</strong>, <strong>altitude</strong>, <strong>time</strong>, <strong>device_mac</strong>, <strong>app_version</strong>, <strong>droid_version</strong>, <strong>device_model</strong>, <strong>ssid</strong>, <strong>bssid</strong>, <strong>caps</strong>, <strong>level</strong> and <strong>freq</strong>.</li>
+</ul>
+<p><em>Example</em></p>
+<div class="highlight-python"><div class="highlight"><pre>http://capstone.cloudapp.net/wifipulling/?batch=5&amp;columns=lat|lng
+</pre></div>
+</div>
+<p><em>Output</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[{</span><span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.6927366</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.9862345</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.6927366</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.9862345</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.6927366</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.9862345</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.6927366</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.9862345</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.6927366</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.9862345</span><span class="p">}]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>Columns can be any combination of attributes available, put &#8216;|&#8217; in between to seperate attributes</li>
+<li>If no column is specified, retrieve all columns</li>
+</ul>
+</div>
+</div>
+<div class="section" id="distinct">
+<h3>distinct<a class="headerlink" href="#distinct" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>distinct=1: distinct output</li>
+<li>distinct not specified: output not distinct</li>
+</ul>
+<p><em>Example: distinct=1</em></p>
+<div class="highlight-python"><div class="highlight"><pre>http://capstone.cloudapp.net/wifipulling/?columns=ssid&amp;distinct=1
+</pre></div>
+</div>
+<p><em>Output: distinct ssids</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[{</span><span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu3&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu2&quot;</span><span class="p">}]</span>
+</pre></div>
+</div>
+<p><em>Example: distinct not specified</em></p>
+<div class="highlight-python"><div class="highlight"><pre>http://capstone.cloudapp.net/wifipulling/?batch=50&amp;columns=ssid|bssid
+</pre></div>
+</div>
+<p><em>Output: not distinct, e.g. {&#8220;ssid&#8221;: &#8220;nyu&#8221;, &#8220;bssid&#8221;: &#8220;cc:d5:39:27:ec:9f&#8221;}</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[{</span><span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:f0:bf&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:f2:40&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:5c:05:a0&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:ec:9f&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:ec:10&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:f2:4f&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:5c:04:bf&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:5c:05:af&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:f0:bf&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:ec:9f&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:f2:4f&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:5c:04:bf&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:5c:05:af&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:f0:b0&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:f0:bf&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:ec:9f&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:f2:4f&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:5c:04:bf&quot;</span><span class="p">},</span>
+<span class="p">{</span><span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:5c:05:af&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:f0:b0&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:f0:bf&quot;</span><span class="p">}]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>Output of any combination of attributes can be distinct</li>
+</ul>
+</div>
+</div>
+<div class="section" id="timeformat">
+<h3>timeformat<a class="headerlink" href="#timeformat" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>timeformat=1: human-readable time returned</li>
+<li>timeformat=2:  both unix time and human-readable time returned</li>
+<li>timeformat not specified: unix time returned</li>
+</ul>
+<p><em>Example: timeformat=1</em></p>
+<div class="highlight-python"><div class="highlight"><pre>http://capstone.cloudapp.net/wifipulling/?batch=5&amp;columns=time&amp;timeformat=1
+</pre></div>
+</div>
+<p><em>Output</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[{</span><span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="s">&quot;11-19-2014 20:23:44&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="s">&quot;11-19-2014 20:23:44&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="s">&quot;11-19-2014 20:23:44&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="s">&quot;11-19-2014 20:23:44&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="s">&quot;11-19-2014 20:23:44&quot;</span><span class="p">}]</span>
+</pre></div>
+</div>
+<p><em>Example: timeformat not specified</em></p>
+<div class="highlight-python"><div class="highlight"><pre>http://capstone.cloudapp.net/wifipulling/?batch=5&amp;columns=time
+</pre></div>
+</div>
+<p><em>Output</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[{</span><span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1416428624717</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1416428624717</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1416428624717</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1416428624717</span><span class="p">},</span> <span class="p">{</span><span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1416428624717</span><span class="p">}]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>If timeformat=1 or 2, it takes time to return JSON object due to conversion</li>
+</ul>
+</div>
+</div>
+<div class="section" id="idx">
+<h3>idx<a class="headerlink" href="#idx" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>idx: equal to a specified index</li>
+</ul>
+<p><em>Example</em></p>
+<div class="highlight-python"><div class="highlight"><pre>http://capstone.cloudapp.net/wifipulling/?idx=1522403
+</pre></div>
+</div>
+<p><em>Output</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">39.0</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">1522403</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">65.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;VS985 4G&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">26.0</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.4.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;58:bf:ea:61:46:cf&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1427740500000</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.72940789</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.99668307</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.8&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;34:4d:f7:0e:6e:e5&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">5745.0</span><span class="p">}]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="acc">
+<h3>acc<a class="headerlink" href="#acc" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>acc: greater than or equal to a specified acc</li>
+</ul>
+<p><em>Example</em></p>
+<div class="highlight-python"><div class="highlight"><pre>http://capstone.cloudapp.net/wifipulling/?acc=120
+</pre></div>
+</div>
+<p><em>Output</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">123.375</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">58974</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">44.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;Nexus 4&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.2.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:ef:40&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1417458072221</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.6933367</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.9860387</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.8&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;40:b0:fa:c4:5d:5f&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">2412.0</span><span class="p">},</span>
+<span class="p">{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">124.193</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">59051</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">44.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;Nexus 4&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.2.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:ef:40&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1417458074834</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.6933237</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.986027</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.8&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;40:b0:fa:c4:5d:5f&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">2412.0</span><span class="p">},</span>
+<span class="p">{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">125.525</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">59165</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">48.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;Nexus 4&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.2.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:ef:40&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1417458077823</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.6933503</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.9860083</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.8&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;40:b0:fa:c4:5d:5f&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">2412.0</span><span class="p">}]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="altitude">
+<h3>altitude<a class="headerlink" href="#altitude" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>altitude: greater than or equal to a specified altitude</li>
+</ul>
+<p><em>Example</em></p>
+<div class="highlight-python"><div class="highlight"><pre>http://capstone.cloudapp.net/wifipulling/?altitude=110
+</pre></div>
+</div>
+<p><em>Output</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">43.0</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">393654</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">60.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;Nexus 4&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="mf">127.30000305176</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.2.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:f0:bf&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1423274436000</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.69235262</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.98594631</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.8&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;40:b0:fa:c4:5d:5f&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">5240.0</span><span class="p">},</span>
+<span class="p">{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">43.0</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">393656</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">64.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;Nexus 4&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="mf">127.30000305176</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.2.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:f0:b0&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1423274436000</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.69235262</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.98594631</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.8&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;40:b0:fa:c4:5d:5f&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">2412.0</span><span class="p">}]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="startdate-and-enddate">
+<h3>startdate and enddate<a class="headerlink" href="#startdate-and-enddate" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>startdate: greater than or equal to a specified date</li>
+<li>enddate: less than a specified date</li>
+</ul>
+<p><em>Example</em></p>
+<div class="highlight-python"><div class="highlight"><pre>http://capstone.cloudapp.net/wifipulling/?startdate=12/2/2014&amp;enddate=12/13/2014&amp;timeformat=1
+</pre></div>
+</div>
+<p><em>Output</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">121.0</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">151546</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">85.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;VS985 4G&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.4.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;2c:3e:cf:a0:e0:ef&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="s">&quot;12-02-2014 17:33:10&quot;</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.69364759</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.98628902</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.8&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;34:4d:f7:0e:6e:e5&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">5180.0</span><span class="p">},</span>
+<span class="p">{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">117.0</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">384615</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">81.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;SCH-I545&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.4.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;1c:1d:86:fd:91:50&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="s">&quot;12-12-2014 20:16:48&quot;</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.69488021</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.99132343</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.8&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;CC:3A:61:15:D0:7A&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">2412.0</span><span class="p">}]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last simple">
+<li>startdate and enddate can be used seperately, meaning startdate can be specified without enddate or enddate can be specified without startdate</li>
+<li>Acceptable date format: mm/dd/yyyy, m/dd/yyyy, mm/d/yyyy, m/d/yyyy</li>
+</ul>
+</div>
+</div>
+<div class="section" id="device-mac">
+<h3>device_mac<a class="headerlink" href="#device-mac" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>device_mac: equal to a specified device_mac</li>
+</ul>
+<p><em>Example</em></p>
+<div class="highlight-python"><div class="highlight"><pre>http://capstone.cloudapp.net/wifipulling/?device_mac=34:4d:f7:0e:6e:e5
+</pre></div>
+</div>
+<p><em>Output</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">62.0</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">39310</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">66.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;VS985 4G&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.4.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;1c:1d:86:fd:52:2f&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1416585772000</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.69500339</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.99078057</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.8&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;34:4d:f7:0e:6e:e5&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">5745.0</span><span class="p">},</span>
+<span class="p">{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">16.0</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">222835</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">65.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;VS985 4G&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.4.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;1c:1d:86:ee:77:10&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1417550570000</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.69383247</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.98702126</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.8&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;34:4d:f7:0e:6e:e5&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">2462.0</span><span class="p">}]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="app-version">
+<h3>app_version<a class="headerlink" href="#app-version" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>app_version: equal to a specified app_version</li>
+</ul>
+<p><em>Example</em></p>
+<div class="highlight-python"><div class="highlight"><pre>http://capstone.cloudapp.net/wifipulling/?app_version=0.8
+</pre></div>
+</div>
+<p><em>Output</em></p>
+<div class="highlight-python"><div class="highlight"><pre>{&quot;acc&quot;: 62.0, &quot;ssid&quot;: &quot;nyu&quot;, &quot;idx&quot;: 39310, &quot;level&quot;: -66.0, &quot;device_model&quot;: &quot;VS985 4G&quot;, &quot;altitude&quot;: 0.0, &quot;droid_version&quot;: &quot;4.4.2&quot;, &quot;caps&quot;: &quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;, &quot;bssid&quot;: &quot;1c:1d:86:fd:52:2f&quot;, &quot;time&quot;: 1416585772000, &quot;lat&quot;: 40.69500339, &quot;lng&quot;: -73.99078057, &quot;app_version&quot;: &quot;0.8&quot;, &quot;device_mac&quot;: &quot;34:4d:f7:0e:6e:e5&quot;, &quot;freq&quot;: 5745.0},
+{&quot;acc&quot;: 124.221, &quot;ssid&quot;: &quot;nyu&quot;, &quot;idx&quot;: 59537, &quot;level&quot;: -75.0, &quot;device_model&quot;: &quot;Nexus 4&quot;, &quot;altitude&quot;: 0.0, &quot;droid_version&quot;: &quot;4.2.2&quot;, &quot;caps&quot;: &quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;, &quot;bssid&quot;: &quot;cc:d5:39:27:ec:1f&quot;, &quot;time&quot;: 1417458088523, &quot;lat&quot;: 40.6932486, &quot;lng&quot;: -73.9860296, &quot;app_version&quot;: &quot;0.8&quot;, &quot;device_mac&quot;: &quot;40:b0:fa:c4:5d:5f&quot;, &quot;freq&quot;: 5765.0}]
+</pre></div>
+</div>
+</div>
+<div class="section" id="droid-version">
+<h3>droid_version<a class="headerlink" href="#droid-version" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>droid_version: equal to a specified droid_version</li>
+</ul>
+<p><em>Example</em></p>
+<div class="highlight-python"><div class="highlight"><pre>http://capstone.cloudapp.net/wifipulling/?droid_version=4.4.2
+</pre></div>
+</div>
+<p><em>Output</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">62.0</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">39310</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">66.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;VS985 4G&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.4.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;1c:1d:86:fd:52:2f&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1416585772000</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.69500339</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.99078057</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.8&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;34:4d:f7:0e:6e:e5&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">5745.0</span><span class="p">},</span>
+<span class="p">{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">34.0</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">207761</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">65.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;VS985 4G&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.4.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;1c:1d:86:ee:77:10&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1417550448000</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.69470769</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.98743707</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.8&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;34:4d:f7:0e:6e:e5&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">2462.0</span><span class="p">}]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="device-model">
+<h3>device_model<a class="headerlink" href="#device-model" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>device_model: equal to a specified device_model</li>
+</ul>
+<p><em>Example</em></p>
+<div class="highlight-python"><div class="highlight"><pre>http://capstone.cloudapp.net/wifipulling/?device_model=VS985 3G
+</pre></div>
+</div>
+<p><em>Output</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">44.0</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu2&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">1522562</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">85.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;VS985 3G&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">26.0</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.4.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;58:bf:ea:60:a0:7f&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1427740501000</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.72940166</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.99668509</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.8&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;34:4d:f7:0e:6e:e5&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">5180.0</span><span class="p">}]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="ssid">
+<h3>ssid<a class="headerlink" href="#ssid" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>single ssid: equal to a specified ssid</li>
+<li>multi ssids:  filter multi ssids, put &#8216;|&#8217; in between to seperate ssids</li>
+</ul>
+<p><em>Example: single ssid</em></p>
+<div class="highlight-python"><div class="highlight"><pre>http://capstone.cloudapp.net/wifipulling/?ssid=nyu
+</pre></div>
+</div>
+<p><em>Output</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">24.948</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">49.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;Nexus 4&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.2.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:f0:bf&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1416428624717</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.6927366</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.9862345</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.5&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;40:b0:fa:c4:5d:5f&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">5240.0</span><span class="p">},</span>
+<span class="p">{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">24.949</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">613</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">45.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;Nexus 4&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.2.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:f0:b0&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1416430306671</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.6927404</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.9862428</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.5&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;40:b0:fa:c4:5d:5f&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">2462.0</span><span class="p">}]</span>
+</pre></div>
+</div>
+<p><em>Example: multi ssids</em></p>
+<div class="highlight-python"><div class="highlight"><pre>http://capstone.cloudapp.net/wifipulling/?ssid=nyu|nyu2|nyu3
+</pre></div>
+</div>
+<p><em>Output</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">24.948</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">49.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;Nexus 4&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.2.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:f0:bf&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1416428624717</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.6927366</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.9862345</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.5&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;40:b0:fa:c4:5d:5f&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">5240.0</span><span class="p">},</span>
+<span class="p">{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">14.0</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu3&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">1522535</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">78.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;VS985 4G&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">26.0</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.4.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;58:bf:ea:41:0e:7f&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1427740501000</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.72940166</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.99668509</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.8&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;34:4d:f7:0e:6e:e5&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">5745.0</span><span class="p">},</span>
+<span class="p">{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">44.0</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu3&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">1522559</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">79.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;VS985 4G&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">26.0</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.4.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;58:bf:ea:76:34:8f&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1427740501000</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.72940166</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.99668509</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.8&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;34:4d:f7:0e:6e:e5&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">5785.0</span><span class="p">},</span>
+<span class="p">{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">44.0</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu2&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">1522562</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">85.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;VS985 3G&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">26.0</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.4.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;58:bf:ea:60:a0:7f&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1427740501000</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.72940166</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.99668509</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.8&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;34:4d:f7:0e:6e:e5&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">5180.0</span><span class="p">}]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="bssid">
+<h3>bssid<a class="headerlink" href="#bssid" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>bssid: equal to a specified bssid</li>
+</ul>
+<p><em>Example</em></p>
+<div class="highlight-python"><div class="highlight"><pre>http://capstone.cloudapp.net/wifipulling/?bssid=d8:24:bd:59:d5:7f
+</pre></div>
+</div>
+<p><em>Output</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">14.0</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">436210</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">79.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;VS985 4G&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.4.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;d8:24:bd:59:d5:7f&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1424289829000</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.72947996</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.99665075</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.8&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;34:4d:f7:0e:6e:e5&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">5180.0</span><span class="p">},</span>
+<span class="p">{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">16.0</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">970322</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">86.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;VS985 4G&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="mf">9.0</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.4.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;d8:24:bd:59:d5:7f&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1425335280000</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.72989395</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.99659445</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.8&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;34:4d:f7:0e:6e:e5&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">5180.0</span><span class="p">}]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="caps">
+<h3>caps<a class="headerlink" href="#caps" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>caps: contains a given string</li>
+</ul>
+<p><em>Example</em></p>
+<div class="highlight-python"><div class="highlight"><pre>http://capstone.cloudapp.net/wifipulling/?caps=WPA
+</pre></div>
+</div>
+<p><em>Output</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">24.948</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">49.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;Nexus 4&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.2.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:f0:bf&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1416428624717</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.6927366</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.9862345</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.5&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;40:b0:fa:c4:5d:5f&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">5240.0</span><span class="p">},</span>
+<span class="p">{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">27.277</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">821</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">50.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;Nexus 4&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.2.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:f0:bf&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1416430319531</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.6927572</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.9862154</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.5&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;40:b0:fa:c4:5d:5f&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">5240.0</span><span class="p">}]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="level">
+<h3>level<a class="headerlink" href="#level" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>level: greater than or equal to a specified level</li>
+</ul>
+<p><em>Example</em></p>
+<div class="highlight-python"><div class="highlight"><pre>http://capstone.cloudapp.net/wifipulling/?level=-50
+</pre></div>
+</div>
+<p><em>Output</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">24.948</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">49.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;Nexus 4&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.2.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:f0:bf&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1416428624717</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.6927366</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.9862345</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.5&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;40:b0:fa:c4:5d:5f&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">5240.0</span><span class="p">},</span>
+<span class="p">{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">24.965</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">203</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">46.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;Nexus 4&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.2.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:f0:b0&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1416430285399</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.6927406</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.9862428</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.5&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;40:b0:fa:c4:5d:5f&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">2462.0</span><span class="p">}]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="freq">
+<h3>freq<a class="headerlink" href="#freq" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>freq: equal to a specified freq</li>
+</ul>
+<p><em>Example</em></p>
+<div class="highlight-python"><div class="highlight"><pre>http://capstone.cloudapp.net/wifipulling/?freq=5180
+</pre></div>
+</div>
+<p><em>Output</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">24.948</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">72.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;Nexus 4&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.2.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:ec:9f&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1416428624717</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.6927366</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.9862345</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.5&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;40:b0:fa:c4:5d:5f&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">5180.0</span><span class="p">},</span>
+<span class="p">{</span><span class="s">&quot;acc&quot;</span><span class="p">:</span> <span class="mf">26.0</span><span class="p">,</span> <span class="s">&quot;ssid&quot;</span><span class="p">:</span> <span class="s">&quot;nyu&quot;</span><span class="p">,</span> <span class="s">&quot;idx&quot;</span><span class="p">:</span> <span class="mi">387355</span><span class="p">,</span> <span class="s">&quot;level&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">75.0</span><span class="p">,</span> <span class="s">&quot;device_model&quot;</span><span class="p">:</span> <span class="s">&quot;Nexus 4&quot;</span><span class="p">,</span> <span class="s">&quot;altitude&quot;</span><span class="p">:</span> <span class="mf">106.0</span><span class="p">,</span> <span class="s">&quot;droid_version&quot;</span><span class="p">:</span> <span class="s">&quot;4.2.2&quot;</span><span class="p">,</span> <span class="s">&quot;caps&quot;</span><span class="p">:</span> <span class="s">&quot;[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]&quot;</span><span class="p">,</span> <span class="s">&quot;bssid&quot;</span><span class="p">:</span> <span class="s">&quot;cc:d5:39:27:ec:9f&quot;</span><span class="p">,</span> <span class="s">&quot;time&quot;</span><span class="p">:</span> <span class="mi">1423250621000</span><span class="p">,</span> <span class="s">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">40.69292831</span><span class="p">,</span> <span class="s">&quot;lng&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">73.98620717</span><span class="p">,</span> <span class="s">&quot;app_version&quot;</span><span class="p">:</span> <span class="s">&quot;0.8&quot;</span><span class="p">,</span> <span class="s">&quot;device_mac&quot;</span><span class="p">:</span> <span class="s">&quot;40:b0:fa:c4:5d:5f&quot;</span><span class="p">,</span> <span class="s">&quot;freq&quot;</span><span class="p">:</span> <span class="mf">5180.0</span><span class="p">}]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="code.html" title="Code Documentation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Wifi-pulling API’s documentation!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Wifi-pulling API 1.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Ya Liu.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,9 @@
+/home/wifind/wifimapping/server/cusp_sonyc_wifi/ingestion/urls.py:5: RemovedInDjango110Warning: django.conf.urls.patterns() is deprecated and will be removed in Django 1.10. Update your urlpatterns to be a list of django.conf.urls.url() instances instead.
+  url(r'^$', views.index, name='index'))
+
+/home/wifind/wifimapping/server/cusp_sonyc_wifi/wifipulling/urls.py:12: RemovedInDjango110Warning: django.conf.urls.patterns() is deprecated and will be removed in Django 1.10. Update your urlpatterns to be a list of django.conf.urls.url() instances instead.
+  url(r'greyTile/(\d+)/(\d+)/(\d+)/', views.greyTile)
+
+/home/wifind/wifimapping/server/cusp_sonyc_wifi/cusp_sonyc_wifi/urls.py:17: RemovedInDjango110Warning: django.conf.urls.patterns() is deprecated and will be removed in Django 1.10. Update your urlpatterns to be a list of django.conf.urls.url() instances instead.
+  url(r'^wifipulling/', include('wifipulling.urls')),
+

@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>scanning.js</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="parallel.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
+                
+                <a class="source" href="app_index.html">
+                  app_index.md
+                </a>
+              
+                
+                <a class="source" href="app.html">
+                  app.js
+                </a>
+              
+                
+                <a class="source" href="controllers.html">
+                  controllers.js
+                </a>
+              
+                
+                <a class="source" href="logging.html">
+                  logging.js
+                </a>
+              
+                
+                <a class="source" href="scanning.html">
+                  scanning.js
+                </a>
+              
+                
+                <a class="source" href="settings.html">
+                  settings.js
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>scanning.js</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <p>The meat of the WiFind app.  Contains all the logic for GPS tracking and
+Wi-Fi scanning.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>angular.module(<span class="hljs-string">'WiFind.Scanning'</span>, [<span class="hljs-string">'WiFind.Logging'</span>])
+.factory(<span class="hljs-string">'scanning'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">
+    $rootScope, $http, $filter,
+    logger, API, localStorageService
+</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <h2 id="global-variables">Global Variables</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Whether or not backgroundGeoLocation has been configured yet</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> configured = <span class="hljs-literal">false</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>Whether the app is currently scanning
+(i.e. whether backgroundGeoLocation) is started.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> currentlyScanning = <span class="hljs-literal">false</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>A counter that gets increased when the app encounters upload trouble.
+Only attempts to upload when timeout is less than 0.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> timeout = <span class="hljs-number">0</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>A varible to hold the local sqlite database pointer</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> db;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Whether the app is currently in the upload function.  Won’t try and
+upload again during this time.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> uploading = <span class="hljs-literal">false</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>Counts once every ten minutes and restarts backgroundGeoLocation after
+6 ticks.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> tickCounter = <span class="hljs-number">0</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>Start an interval to make sure that backgroundGeoLocation doesn’t die.
+Occasionally after long time of inactivity (such as having the phone)
+still overnight, the backgroundGeoLocation doesn’t resume.  This ensures
+that it will restart at least every hour.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    setInterval(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+        <span class="hljs-keyword">if</span> (++tickCounter == <span class="hljs-number">6</span>) {
+            tickCounter = <span class="hljs-number">0</span>;
+
+            handleScanningSetting(<span class="hljs-literal">false</span>);
+            handleScanningSetting($rootScope.settings.enableScanning);
+        }
+    }, <span class="hljs-number">600000</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <h2 id="tryupload">tryUpload</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>A function which will check whether upload conditions are met and if they
+are, will attempt uploading.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> tryUpload = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+        uploading = <span class="hljs-literal">true</span>;
+        <span class="hljs-keyword">var</span> keys = localStorageService.keys();
+        <span class="hljs-keyword">var</span> online = navigator.connection.type !== Connection.NONE;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>If we have a network connection and at least 10 scan results and
+don’t have a timeout.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (online &amp;&amp; keys.length &gt;= <span class="hljs-number">10</span> &amp;&amp; --timeout &lt; <span class="hljs-number">0</span>) {
+            <span class="hljs-keyword">var</span> scans = {scans: []};</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>Get each scan out of local storage.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; keys.length; i++) {
+                scans.scans.push(localStorageService.get(keys[i]));
+            }
+
+            logger.log(<span class="hljs-string">'Uploading '</span> + scans.scans.length + <span class="hljs-string">' scans.'</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <p>Try posting scans</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            $http.post(API.url, scans).then(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+                logger.log(<span class="hljs-string">'Upload success!'</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p>If successful remove scans from storage</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; keys.length; i++) {
+                    localStorageService.remove(keys[i]);
+                }
+
+                uploading = <span class="hljs-literal">false</span>;
+            }, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">res</span>) </span>{
+                logger.log(<span class="hljs-string">'upload failed :('</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <p>If upload fails, don’t try uploading for a bit</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                timeout = <span class="hljs-number">60</span>;
+
+                uploading = <span class="hljs-literal">false</span>;
+            });
+        } <span class="hljs-keyword">else</span> {
+            uploading = <span class="hljs-literal">false</span>;
+        }
+    };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <h2 id="scan">scan</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p>Function that is called when movement is detected by
+backgroundGeoLocation.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> scan = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">location</span>) </span>{
+        logger.log(<span class="hljs-string">'lat='</span> + location.latitude + <span class="hljs-string">' lon='</span> + location.longitude);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p>Add the non-wifi data to the scan results.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">var</span> scanResults = {
+            device_model: device.model,
+            droid_version: device.version,
+            app_version: $rootScope.APPLICATION_VERSION,
+            device_mac: $rootScope.settings.uploadMacAddress ? device.uuid : <span class="hljs-string">""</span>,
+
+            time: location.time,
+
+            altitude: location.altitude,
+            lat: location.latitude,
+            lng: location.longitude,
+            acc: location.accuracy
+        };
+
+        logger.log(<span class="hljs-string">"Before Scan"</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <p>Scan for wifi networks</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        WifiWizard.scan(<span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">results</span>) </span>{
+            logger.log(<span class="hljs-string">"Scan Returned"</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>Calculate the distance moved between getting geolocation
+and finishing the Wi-Fi scan based on speed at the time of the
+scan and duration of the scan.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">var</span> scan_distance = <span class="hljs-built_in">Math</span>.abs((<span class="hljs-keyword">new</span> <span class="hljs-built_in">Date</span>().getTime() - location.time)/<span class="hljs-number">1000</span> * location.speed);
+            logger.log(<span class="hljs-string">"Distance = "</span> + scan_distance);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <p>If the distance is more than 10 meters, ignore the data because
+it is likely inaccurate.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">if</span> (scan_distance &gt; <span class="hljs-number">10</span>) {
+                logger.log(<span class="hljs-string">"scan distance too far!"</span>);
+                <span class="hljs-keyword">return</span>;
+            }
+
+            logger.log(results.length + <span class="hljs-string">' networks found'</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-23">&#182;</a>
+              </div>
+              <p>Update the user’s stats</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            $rootScope.stats.current = results.length;
+            storeStats(results.length);
+
+
+            <span class="hljs-keyword">var</span> readings = [];
+
+            <span class="hljs-keyword">if</span> (results.length === <span class="hljs-number">0</span>) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-24">&#182;</a>
+              </div>
+              <p>If there were no wifi results, add a dummy result</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                logger.log(<span class="hljs-string">'Egad! No wifi scan results!'</span>);
+                readings.push({
+                    BSSID: <span class="hljs-string">""</span>,
+                    SSID: <span class="hljs-string">""</span>,
+                    caps: <span class="hljs-string">""</span>
+                });
+            } <span class="hljs-keyword">else</span> {
+                <span class="hljs-keyword">for</span> (<span class="hljs-keyword">var</span> i = <span class="hljs-number">0</span>; i &lt; results.length; i++) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <p>Convert results format for API</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                    readings.push({
+                        level: results[i].level,
+                        BSSID: results[i].BSSID,
+                        SSID: results[i].SSID,
+                        caps: results[i].capabilities,
+                        freq: results[i].frequency
+                    });
+                }
+            }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <p>Create scanResults object for API</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            scanResults[<span class="hljs-string">'readings'</span>] = readings;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <p>Save scanResults for bulk upload later</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            logger.log(<span class="hljs-string">'saving results'</span>);
+            localStorageService.set(location.time, scanResults);
+            logger.log(<span class="hljs-string">'Scan count = '</span> + localStorageService.keys().length);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
+              </div>
+              <p>Attempt to upload if conditions are right</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            $rootScope.$apply(<span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+                <span class="hljs-keyword">if</span> (!uploading) {
+                    tryUpload();
+                }
+
+                $rootScope.networks = results;
+            });
+        }, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">results</span>) </span>{
+            logger.log(<span class="hljs-string">'WifiWizard Error!'</span>);
+        });
+    };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-29">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-29">&#182;</a>
+              </div>
+              <h2 id="scanerror">scanError</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-30">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-30">&#182;</a>
+              </div>
+              <p>Function called when there is a backgroundGeoLocation error</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> scanError = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{
+        logger.log(<span class="hljs-string">'Scan Error!'</span>);
+    };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-31">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-31">&#182;</a>
+              </div>
+              <h2 id="handlescanningsetting">handleScanningSetting</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-32">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-32">&#182;</a>
+              </div>
+              <p>Handle a change to the scanning enabled/disabled setting</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> handleScanningSetting = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">enable</span>) </span>{
+        logger.log(<span class="hljs-string">'handleScanningSetting'</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-33">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-33">&#182;</a>
+              </div>
+              <p>If not yet configured, return.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (!configured) {
+            logger.log(<span class="hljs-string">'Not yet configured!'</span>);
+            <span class="hljs-keyword">return</span>;
+        }
+
+        <span class="hljs-keyword">if</span> (enable &amp;&amp; !currentlyScanning) {
+            logger.log(<span class="hljs-string">'Enable Scanning'</span>);
+            backgroundGeoLocation.start();
+            currentlyScanning = <span class="hljs-literal">true</span>;
+        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (!enable &amp;&amp; currentlyScanning) {
+            logger.log(<span class="hljs-string">'Disable Scanning'</span>);
+            backgroundGeoLocation.stop();
+            $rootScope.networks = [];
+            currentlyScanning = <span class="hljs-literal">false</span>;
+        }
+    };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-34">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-34">&#182;</a>
+              </div>
+              <h2 id="storestats">storeStats</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-35">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-35">&#182;</a>
+              </div>
+              <p>Store the newly found network count into the local sqlite database.
+Counts are stored as a pair (date,count).</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> storeStats = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">count</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-36">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-36">&#182;</a>
+              </div>
+              <p>First check to see if there is an entry for the current date.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        db.executeSql(<span class="hljs-string">"select scan_count from scan_counts WHERE day=date(datetime('now', 'localtime'));"</span>, [], <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">resultSet</span>) </span>{
+            <span class="hljs-keyword">if</span> (resultSet.rows.length == <span class="hljs-number">0</span>) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-37">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-37">&#182;</a>
+              </div>
+              <p>If not, insert a new row with the current count.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                db.executeSql(<span class="hljs-string">"insert into scan_counts values(date(datetime('now', 'localtime')),"</span> + count + <span class="hljs-string">")"</span>, [], <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">resultSet</span>) </span>{
+                    updateStats();
+                });
+            } <span class="hljs-keyword">else</span> {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-38">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-38">&#182;</a>
+              </div>
+              <p>If there is, update the row with the new count.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                <span class="hljs-keyword">var</span> new_count = resultSet.rows.item(<span class="hljs-number">0</span>).scan_count + count;
+                db.executeSql(<span class="hljs-string">"update scan_counts set scan_count = "</span> + new_count + <span class="hljs-string">" where day=date(datetime('now', 'localtime'));"</span>, [], <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">resultSet</span>) </span>{
+                    updateStats();
+                });
+            }
+        });
+    };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-39">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-39">&#182;</a>
+              </div>
+              <h2 id="updatestats">updateStats</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-40">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-40">&#182;</a>
+              </div>
+              <p>Update the stats display on the main page.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> updateStats = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
+        <span class="hljs-keyword">var</span> sql = <span class="hljs-string">"select (select sum(scan_count) from scan_counts) as total, (select scan_count from scan_counts where day=date(datetime('now', 'localtime'))) as today, (select scan_count from scan_counts where day=date(datetime('now', 'localtime'), '-1 day')) as yesterday, (select sum(scan_count) from scan_counts where strftime('%m',day)=strftime('%m','now')) as month;"</span>;
+        db.executeSql(sql, [], <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">resultSet</span>) </span>{
+            $rootScope.stats.total = resultSet.rows.item(<span class="hljs-number">0</span>).total !== <span class="hljs-literal">null</span> ? resultSet.rows.item(<span class="hljs-number">0</span>).total : <span class="hljs-number">0</span>;
+            $rootScope.stats.today = resultSet.rows.item(<span class="hljs-number">0</span>).today !== <span class="hljs-literal">null</span> ? resultSet.rows.item(<span class="hljs-number">0</span>).today : <span class="hljs-number">0</span>;
+            $rootScope.stats.yesterday = resultSet.rows.item(<span class="hljs-number">0</span>).yesterday !== <span class="hljs-literal">null</span> ? resultSet.rows.item(<span class="hljs-number">0</span>).yesterday : <span class="hljs-number">0</span>;
+            $rootScope.stats.month = resultSet.rows.item(<span class="hljs-number">0</span>).month !== <span class="hljs-literal">null</span> ? resultSet.rows.item(<span class="hljs-number">0</span>).month : <span class="hljs-number">0</span>;
+            <span class="hljs-keyword">if</span> (!$rootScope.$$phase) {
+                $rootScope.$apply();
+            }
+        });
+    };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-41">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-41">&#182;</a>
+              </div>
+              <h2 id="configurebackgroundgeolocation">configureBackgroundGeoLocation</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-42">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-42">&#182;</a>
+              </div>
+              <p>Configure backgroundGeoLocation plugin based on user settings.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> configureBackgroundGeoLocation = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">value</span>) </span>{
+        logger.log(<span class="hljs-string">'configureBackgroundGeoLocation = '</span> + value);
+
+        <span class="hljs-keyword">if</span> (value === <span class="hljs-literal">undefined</span>) {
+            <span class="hljs-keyword">return</span>;
+        }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-43">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-43">&#182;</a>
+              </div>
+              <p>If there is a change in settings and backgroundGeoLocation is
+currently running, stop it.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (currentlyScanning) {
+            backgroundGeoLocation.stop();
+            currentlyScanning = <span class="hljs-literal">false</span>;
+        }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-44">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-44">&#182;</a>
+              </div>
+              <p>backgroundGeoLocation common settings</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">var</span> conf = {
+            debug: <span class="hljs-literal">false</span>, <span class="hljs-comment">// &lt;-- enable this hear sounds for background-geolocation life-cycle.</span>
+            stopOnTerminate: <span class="hljs-literal">false</span>, <span class="hljs-comment">// &lt;-- enable this to clear background location settings when the app terminates</span>
+            locationService: backgroundGeoLocation.provider.ANDROID_DISTANCE_FILTER_PROVIDER,
+            notificationTitle: <span class="hljs-string">'WiFind'</span>,
+            notificationText: <span class="hljs-string">'Background location tracking is enabled.'</span>,
+            startOnBoot: $rootScope.settings.autostart
+        };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-45">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-45">&#182;</a>
+              </div>
+              <p>Different settings depending on the user’s polling intensity setting.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (value === <span class="hljs-string">'low'</span>) {
+            conf.desiredAccuracy = <span class="hljs-number">10</span>;
+            conf.stationaryRadius = <span class="hljs-number">10</span>;
+            conf.distanceFilter = <span class="hljs-number">10</span>;
+            conf.interval = <span class="hljs-number">10000</span>;
+        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (value === <span class="hljs-string">'medium'</span>) {
+            conf.desiredAccuracy = <span class="hljs-number">10</span>;
+            conf.stationaryRadius = <span class="hljs-number">5</span>;
+            conf.distanceFilter = <span class="hljs-number">5</span>;
+            conf.interval = <span class="hljs-number">3000</span>;
+        } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (value === <span class="hljs-string">'high'</span>) {
+            conf.desiredAccuracy = <span class="hljs-number">0</span>;
+            conf.stationaryRadius = <span class="hljs-number">3</span>;
+            conf.distanceFilter = <span class="hljs-number">1</span>;
+            conf.interval = <span class="hljs-number">1000</span>;
+        }
+
+        backgroundGeoLocation.configure(scan, scanError, conf);
+        configured = <span class="hljs-literal">true</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-46">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-46">&#182;</a>
+              </div>
+              <p>Restart scanning if it’s enabled</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        handleScanningSetting($rootScope.settings.enableScanning);
+    };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-47">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-47">&#182;</a>
+              </div>
+              <h2 id="loadstats">loadStats</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-48">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-48">&#182;</a>
+              </div>
+              <p>Load the stats on startup</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> loadStats = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-49">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-49">&#182;</a>
+              </div>
+              <p>Default stats while the DB is queried</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        $rootScope.stats = {
+            current: <span class="hljs-number">0</span>,
+            total: <span class="hljs-number">-1</span>,
+            today: <span class="hljs-number">-1</span>,
+            yesterday: <span class="hljs-number">-1</span>,
+            month: <span class="hljs-number">-1</span>
+        };
+
+        db = <span class="hljs-built_in">window</span>.sqlitePlugin.openDatabase({ name: <span class="hljs-string">'wifind.db'</span>, location: <span class="hljs-string">'default'</span>, androidDatabaseImplementation: <span class="hljs-number">2</span>}, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">db</span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-50">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-50">&#182;</a>
+              </div>
+              <p>If this is the first time the app is launched, create the table.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            db.executeSql(<span class="hljs-string">'CREATE TABLE IF NOT EXISTS scan_counts (day date, scan_count integer)'</span>, [], <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">resultSet</span>) </span>{
+                updateStats();
+            }, <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">error</span>) </span>{
+                <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'Create Table ERROR: '</span> + <span class="hljs-built_in">JSON</span>.stringify(error));
+            });
+        }, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">error</span>) </span>{
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'Open database ERROR: '</span> + <span class="hljs-built_in">JSON</span>.stringify(error));
+        });
+    };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-51">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-51">&#182;</a>
+              </div>
+              <h2 id="init">init</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-52">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-52">&#182;</a>
+              </div>
+              <p>Intialize things at app startup.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">var</span> init = <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-53">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-53">&#182;</a>
+              </div>
+              <p>Clear notification which may still exist from previous version.
+Once everyone no users are on 0.3.0 anymore, this line can be
+removed.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        cordova.plugins.notification.local.clear(<span class="hljs-number">1</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{});</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-54">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-54">&#182;</a>
+              </div>
+              <p>load the stats DB</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        loadStats();
+    };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-55">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-55">&#182;</a>
+              </div>
+              <p>Return the public functions</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">return</span> {
+        handleScanningSetting: handleScanningSetting,
+        configureBackgroundGeoLocation: configureBackgroundGeoLocation,
+        init: init
+    };
+});</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

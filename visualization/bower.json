@@ -1,0 +1,22 @@
+{
+  "name": "visualization",
+  "homepage": "https://github.com/wifimapping/visualization",
+  "authors": [
+    "CUSP"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "heatmap.js-amd": "https://github.com/wifimapping/heatmap.js.git",
+    "wifimapping-jsapi": "https://github.com/docmarionum1/jsapi.git"
+  }
+}

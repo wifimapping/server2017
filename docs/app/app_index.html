@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>WiFind Mobile App</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="parallel.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
+                
+                <a class="source" href="app_index.html">
+                  app_index.md
+                </a>
+              
+                
+                <a class="source" href="app.html">
+                  app.js
+                </a>
+              
+                
+                <a class="source" href="controllers.html">
+                  controllers.js
+                </a>
+              
+                
+                <a class="source" href="logging.html">
+                  logging.js
+                </a>
+              
+                
+                <a class="source" href="scanning.html">
+                  scanning.js
+                </a>
+              
+                
+                <a class="source" href="settings.html">
+                  settings.js
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <h1 id="wifind-mobile-app">WiFind Mobile App</h1>
+<p>Documentation for the WiFind mobile application that is used for collecting
+Wi-Fi data.</p>
+<p>The WiFind mobile application is built as a non-native app using cordova,
+phonegap, ionic and angular.</p>
+<p>The code for the app is contained within the <code>www</code> directory. Within that there
+is a <code>css</code> directory with the style sheet, a <code>modules</code> directory which contains
+most of the javascript logic (outlined below) and a <code>views</code> directory which
+contains the html template and javascript controllers for each of the app’s
+views.</p>
+<h1 id="modules">Modules</h1>
+<ul>
+<li><a href="app.html">app</a></li>
+<li><a href="controllers.html">controllers</a></li>
+<li><a href="logging.html">logging</a></li>
+<li><a href="scanning.html">scanning</a></li>
+<li><a href="settings.html">settings</a></li>
+</ul>
+<h1 id="setup">Setup</h1>
+<ol>
+<li>Install <a href="nodejs.org">Nodejs</a></li>
+<li>Install phonegap, cordova, ionic and bower globally</li>
+</ol>
+<p><code>npm install -g phonegap cordova ionic bower</code></p>
+<ol>
+<li>Setup the app’s platforms and plugins:</li>
+</ol>
+<p><code>ionic state restore</code></p>
+<ol>
+<li>Install bower packages:</li>
+</ol>
+<p><code>bower install</code></p>
+<h1 id="testing">Testing</h1>
+<p>Test the app locally with:</p>
+<p><code>phonegap serve</code></p>
+<p>None of the native phone features will work, but the app should load in a browser and not have javascript errors.</p>
+<p>To test it on a phone you can build an APK and then install it. Build it with:</p>
+<p><code>phonegap remote build android</code></p>
+
+            </div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

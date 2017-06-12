@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en" ng-app="Heatmap">
+    <head>
+        <meta charset="utf-8">
+        <title>Wifi Heatmap</title>
+        <style>
+            body, html { margin:0; padding:0; height:100%;}
+            #map { height:100%; }
+        </style>
+        <script src="../bower_components/angular/angular.js"></script>
+        <script src="../bower_components/wifimapping-jsapi/src/wifimappingapi.js"></script>
+        <script src="../bower_components/heatmap.js-amd/build/heatmap.js"></script>
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+        <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+        <script src="../bower_components/heatmap.js-amd/plugins/leaflet-heatmap.js"></script>
+        <script src="index.js"></script>
+    </head>
+    <body ng-controller="Ctrl">
+        <div>
+            <label> SSID: <input type="text" ng-model='params.ssid'></label>
+            <label for="aggregation">Aggregation Function: </label>
+            <select name="aggregation" ng-model="params.aggregation">
+                <option value="median" selected="selected">Median</option>
+                <option value="mean">Mean</option>
+                <option value="max">Max</option>
+            </select>
+            <button ng-click="execute()">Show Map</button>
+        </div>
+        <div id="map"></div>
+    </body>
+</html>

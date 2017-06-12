@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>lib.py</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="parallel.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
+                
+                <a class="source" href="__init__.html">
+                  __init__.py
+                </a>
+              
+                
+                <a class="source" href="admin.html">
+                  admin.py
+                </a>
+              
+                
+                <a class="source" href="lib.html">
+                  lib.py
+                </a>
+              
+                
+                <a class="source" href="models.html">
+                  models.py
+                </a>
+              
+                
+                <a class="source" href="tests.html">
+                  tests.py
+                </a>
+              
+                
+                <a class="source" href="urls.html">
+                  urls.py
+                </a>
+              
+                
+                <a class="source" href="views.html">
+                  views.py
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>lib.py</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              <p><code>lib</code> contains utility functions around generating tiles.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">from</span> ingestion.models <span class="hljs-keyword">import</span> WifiScan
+<span class="hljs-keyword">import</span> math
+<span class="hljs-keyword">import</span> time
+<span class="hljs-keyword">import</span> os
+<span class="hljs-keyword">import</span> pandas <span class="hljs-keyword">as</span> pd
+<span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
+<span class="hljs-keyword">from</span> scipy.misc <span class="hljs-keyword">import</span> imresize
+<span class="hljs-keyword">from</span> matplotlib <span class="hljs-keyword">import</span> cm
+<span class="hljs-keyword">from</span> PIL <span class="hljs-keyword">import</span> Image, ImageDraw
+<span class="hljs-keyword">from</span> django.db <span class="hljs-keyword">import</span> connection
+<span class="hljs-keyword">from</span> django.conf <span class="hljs-keyword">import</span> settings
+<span class="hljs-keyword">from</span> django.db.models <span class="hljs-keyword">import</span> Max</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <h2 id="gettopssids">getTopSSIDs</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Return a list of ssids which have a number of datapoints greater than
+<code>threshold</code></p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">getTopSSIDs</span><span class="hljs-params">(threshold=settings.SSID_THRESHOLD)</span>:</span>
+    cursor = connection.cursor()
+    cursor.execute(<span class="hljs-string">'SELECT ssid FROM wifi_scan GROUP BY ssid HAVING COUNT(*) &gt; %s;'</span> % (threshold))
+    <span class="hljs-keyword">return</span> [i[<span class="hljs-number">0</span>] <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> cursor.fetchall() <span class="hljs-keyword">if</span> i[<span class="hljs-number">0</span>]]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <h2 id="getpath">getPath</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>Get the path of a heatmap tile</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">getPath</span><span class="hljs-params">(ssid, agg_function, zoom, x, y)</span>:</span>
+    path = os.path.join(
+	settings.TILE_DIR, ssid, agg_function,
+	str(zoom), str(x), <span class="hljs-string">'%s.png'</span> % y
+    )
+    <span class="hljs-keyword">return</span> path</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <h2 id="getgreypath">getGreyPath</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Get the path of a grey layer tile</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">getGreyPath</span><span class="hljs-params">(zoom, x, y)</span>:</span>
+    path = os.path.join(
+	settings.GREYTILE_DIR,
+	str(zoom), str(x), <span class="hljs-string">'%s.png'</span> % y
+    )
+    <span class="hljs-keyword">return</span> path</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <h2 id="generatetiles">generateTiles</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>generateTiles generates all the tiles for a given ssid from the minimum
+zoom level to the maximum zoom level and saves them all to disk.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">generateTiles</span><span class="hljs-params">(ssid)</span>:</span>
+    print(<span class="hljs-string">"generateTiles"</span>,ssid)
+    zoom_range=range(settings.ZOOM_MIN, settings.ZOOM_MAX+<span class="hljs-number">1</span>)
+    
+    <span class="hljs-keyword">if</span> ssid == <span class="hljs-string">"Known Open Wi-Fi"</span>:
+        <span class="hljs-string">'''f = WifiScan.objects.filter(ssid__in=[
+            '#flatiron free wifi', '.freewifibysurface', '@smartfi-open', 'attwifi', 
+            'bryantpark.org', 'CableWiFi', 'cablewifi', 'DowntownBrooklynWiFi_Fon', 
+            'linknyc free wi-fi', 'Metrotech', 'optimumwifi', 'TWCWiFi', 'twcwifi', 
+            'usp park wifi', 'xfinitywifi'
+        ])'''</span>
+        f = WifiScan.objects.filter(ssid__in=[
+            <span class="hljs-string">'#flatiron free wifi'</span>, <span class="hljs-string">'.freewifibysurface'</span>, 
+            <span class="hljs-string">'bryantpark.org'</span>, <span class="hljs-string">'DowntownBrooklynWiFi_Fon'</span>, 
+            <span class="hljs-string">'linknyc free wi-fi'</span>, <span class="hljs-string">'Metrotech'</span>,
+            <span class="hljs-string">'usp park wifi'</span>, <span class="hljs-string">'Red Hook Wifi'</span>
+        ])
+    <span class="hljs-keyword">elif</span> ssid == <span class="hljs-string">"All Wi-Fi"</span>:
+        f = WifiScan.objects
+    <span class="hljs-keyword">else</span>:
+        f = WifiScan.objects.filter(ssid=ssid)
+
+    df = pd.DataFrame.from_records(
+        f.values(<span class="hljs-string">'lat'</span>, <span class="hljs-string">'lng'</span>, <span class="hljs-string">'time'</span>).annotate(level=Max(<span class="hljs-string">'level'</span>))
+    ).round(<span class="hljs-number">4</span>)
+
+    unique = df.drop_duplicates(subset=[<span class="hljs-string">'lat'</span>, <span class="hljs-string">'lng'</span>])
+
+
+    <span class="hljs-keyword">for</span> zoom <span class="hljs-keyword">in</span> zoom_range:
+        generated = {}
+
+        <span class="hljs-keyword">for</span> row <span class="hljs-keyword">in</span> unique.iterrows():
+            loc = deg2num(row[<span class="hljs-number">1</span>][<span class="hljs-string">'lat'</span>], row[<span class="hljs-number">1</span>][<span class="hljs-string">'lng'</span>], zoom)
+            x,y = loc
+            <span class="hljs-keyword">if</span> loc <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> generated:
+                generated[loc] = <span class="hljs-keyword">True</span>
+
+	        <span class="hljs-keyword">for</span> agg_function <span class="hljs-keyword">in</span> settings.AGGREGATION:
+	            tile = generateTile(x, y, zoom, {
+		        <span class="hljs-string">'ssid'</span>: ssid,
+		        <span class="hljs-string">'agg_function'</span>: agg_function
+	            }, df)
+
+	            path = getPath(ssid, agg_function, zoom, x, y)
+	            <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> os.path.exists(os.path.dirname(path)):
+		        os.makedirs(os.path.dirname(path))
+	            tile.save(path)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <h2 id="generategreytiles">generateGreyTiles</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>generateGreyTiles generates all the tiles for the grey layer from the minimum
+zoom level to the maximum zoom level and saves them all to disk.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">generateGreyTiles</span><span class="hljs-params">()</span>:</span>
+    zoom_range=range(settings.ZOOM_MIN, settings.ZOOM_MAX+<span class="hljs-number">1</span>)
+
+    df1 = pd.DataFrame.from_records(
+	   WifiScan.objects.values(<span class="hljs-string">'lat'</span>, <span class="hljs-string">'lng'</span>)
+    ).round(<span class="hljs-number">4</span>)
+    df = df1.drop_duplicates(subset=[<span class="hljs-string">'lat'</span>,<span class="hljs-string">'lng'</span>])
+
+    <span class="hljs-keyword">for</span> zoom <span class="hljs-keyword">in</span> zoom_range:
+        generated = {}
+
+        <span class="hljs-keyword">for</span> row <span class="hljs-keyword">in</span> df.iterrows():
+            loc = deg2num(row[<span class="hljs-number">1</span>][<span class="hljs-string">'lat'</span>], row[<span class="hljs-number">1</span>][<span class="hljs-string">'lng'</span>], zoom)
+            x,y = loc
+            <span class="hljs-keyword">if</span> loc <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> generated:
+                generated[loc] = <span class="hljs-keyword">True</span>
+
+                tile = generateGreyTile(x, y, zoom, df)
+
+                <span class="hljs-keyword">if</span> tile != <span class="hljs-keyword">None</span>:
+                    path = getGreyPath(zoom, x, y)
+                    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> os.path.exists(os.path.dirname(path)):
+                        os.makedirs(os.path.dirname(path))
+                    tile.save(path)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <h2 id="num2deg">num2deg</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>Convert slippy map <code>x</code>,<code>y</code>,<code>zoom</code> to the corresponding latitude/longitude pair.
+Taken from the
+<a href="http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Python">openstreetmap wiki</a>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">num2deg</span><span class="hljs-params">(xtile, ytile, zoom)</span>:</span>
+    n = <span class="hljs-number">2.0</span> ** zoom
+    lon_deg = xtile / n * <span class="hljs-number">360.0</span> - <span class="hljs-number">180.0</span>
+    lat_rad = math.atan(math.sinh(math.pi * (<span class="hljs-number">1</span> - <span class="hljs-number">2</span> * ytile / n)))
+    lat_deg = math.degrees(lat_rad)
+    <span class="hljs-keyword">return</span> (lat_deg, lon_deg)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-14">&#182;</a>
+              </div>
+              <h2 id="deg2num">deg2num</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p>Convert latitude/longitude/zoom to a the corresponding slippy map <code>x</code> and <code>y</code>.
+Taken from the
+<a href="http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames#Python">openstreetmap wiki</a>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">deg2num</span><span class="hljs-params">(lat_deg, lon_deg, zoom)</span>:</span>
+  lat_rad = math.radians(lat_deg)
+  n = <span class="hljs-number">2.0</span> ** zoom
+  xtile = int((lon_deg + <span class="hljs-number">180.0</span>) / <span class="hljs-number">360.0</span> * n)
+  ytile = int((<span class="hljs-number">1.0</span> - math.log(math.tan(lat_rad) + (<span class="hljs-number">1</span> / math.cos(lat_rad))) / math.pi) / <span class="hljs-number">2.0</span> * n)
+  <span class="hljs-keyword">return</span> (xtile, ytile)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-16">&#182;</a>
+              </div>
+              <h2 id="generatetile">generateTile</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-17">&#182;</a>
+              </div>
+              <p>generateTile generates a single 256x256 pixel tile for the given parameters.
+<code>x</code>, <code>y</code> and <code>zoom</code> define the geospacial location of the tile in the
+slippy map standard. <code>params</code> is a dictionary containing the ssid and
+aggregation function to be used.  <code>allRecords</code> optionally contains a pandas
+DataFrame containing all the records for the given ssid.  If <code>None</code>, then
+the database will be queried.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">generateTile</span><span class="hljs-params">(x, y, zoom, params, allRecords=None)</span>:</span>
+    timestamp = int(time.time())
+    ssid = params[<span class="hljs-string">'ssid'</span>]
+    agg_function = params[<span class="hljs-string">'agg_function'</span>]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-18">&#182;</a>
+              </div>
+              <p>Get the corners</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    nw_corner = num2deg(x, y, zoom)
+    se_corner = num2deg(x+<span class="hljs-number">1</span>, y+<span class="hljs-number">1</span>, zoom)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-19">&#182;</a>
+              </div>
+              <p>Get lists of the two latitudes and two longitudes in ascending order</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    lats = [min(nw_corner[<span class="hljs-number">0</span>], se_corner[<span class="hljs-number">0</span>]), max(nw_corner[<span class="hljs-number">0</span>], se_corner[<span class="hljs-number">0</span>])]
+    lngs = [min(nw_corner[<span class="hljs-number">1</span>], se_corner[<span class="hljs-number">1</span>]), max(nw_corner[<span class="hljs-number">1</span>], se_corner[<span class="hljs-number">1</span>])]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <p>Add a little bit of buffer around the edges to make sure to catch
+squares that are on the edge of the tile and then round to 4 decimals.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    lats2 = np.around([lats[<span class="hljs-number">0</span>] - <span class="hljs-number">.0002</span>, lats[<span class="hljs-number">1</span>] + <span class="hljs-number">.0002</span>], decimals=<span class="hljs-number">4</span>)
+    lngs2 = np.around([lngs[<span class="hljs-number">0</span>] - <span class="hljs-number">.0002</span>, lngs[<span class="hljs-number">1</span>] + <span class="hljs-number">.0002</span>], decimals=<span class="hljs-number">4</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-21">&#182;</a>
+              </div>
+              <p>If allRecords is defined, then filter is based on the current tile
+otherwise query the DB for the specific data and add it to a DataFrame</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> allRecords <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-keyword">None</span>:
+        df = allRecords[
+            (allRecords.lat &gt;= lats2[<span class="hljs-number">0</span>]) &amp;
+            (allRecords.lat &lt;= lats2[<span class="hljs-number">1</span>]) &amp;
+            (allRecords.lng &gt;= lngs2[<span class="hljs-number">0</span>]) &amp;
+            (allRecords.lng &lt;= lngs2[<span class="hljs-number">1</span>])
+        ]
+
+    <span class="hljs-keyword">else</span>:
+        records = WifiScan.objects.filter(
+            ssid=ssid,
+            lat__gte=lats2[<span class="hljs-number">0</span>], lat__lte=lats2[<span class="hljs-number">1</span>],
+            lng__gte=lngs2[<span class="hljs-number">0</span>], lng__lte=lngs2[<span class="hljs-number">1</span>],
+        ).values(<span class="hljs-string">'lat'</span>, <span class="hljs-string">'lng'</span>, <span class="hljs-string">'time'</span>).annotate(level=Max(<span class="hljs-string">'level'</span>))</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-22">&#182;</a>
+              </div>
+              <p>).values(‘lat’, ‘lng’, ‘level’)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+        df = pd.DataFrame.from_records(
+            records
+        )
+
+        df = df.round(<span class="hljs-number">4</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-23">&#182;</a>
+              </div>
+              <p>If the tile is empty, just return a transparent tile</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> len(df) == <span class="hljs-number">0</span>:
+        <span class="hljs-keyword">return</span> Image.new(<span class="hljs-string">"RGBA"</span>, (<span class="hljs-number">256</span>,<span class="hljs-number">256</span>))</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-24">&#182;</a>
+              </div>
+              <p>Group the data into the .0001 lat x .0001 lng squares and aggregate</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    groups = df.groupby((<span class="hljs-string">'lat'</span>, <span class="hljs-string">'lng'</span>), as_index=<span class="hljs-keyword">False</span>)
+    points = getattr(groups, agg_function)()</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-25">&#182;</a>
+              </div>
+              <p>Get a list of the x/y bins for the data.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    bins = [
+        np.arange(lngs2[<span class="hljs-number">0</span>]<span class="hljs-number">-.00005</span>, lngs2[<span class="hljs-number">1</span>]+<span class="hljs-number">.00005</span>, <span class="hljs-number">.0001</span>),
+        np.arange(lats2[<span class="hljs-number">0</span>]<span class="hljs-number">-.00005</span>, lats2[<span class="hljs-number">1</span>]+<span class="hljs-number">.00005</span>, <span class="hljs-number">.0001</span>)
+    ]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-26">&#182;</a>
+              </div>
+              <p>Bin the data</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    zi, xi, yi = np.histogram2d(
+        points[<span class="hljs-string">'lng'</span>], points[<span class="hljs-string">'lat'</span>], weights=points[<span class="hljs-string">'level'</span>], normed=<span class="hljs-keyword">False</span>,
+        bins=bins
+    )</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <p>Scale the data to 0-255 and rotate correctly</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    zi = np.ma.masked_equal(zi, <span class="hljs-number">0</span>)
+    zi = ((np.clip(zi, <span class="hljs-number">-90</span>, <span class="hljs-number">-29</span>) + <span class="hljs-number">91</span>) * <span class="hljs-number">4.25</span>).astype(int)
+    zi = np.rot90(zi)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-28">&#182;</a>
+              </div>
+              <p>Color the data</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    color = np.uint8(cm.jet(zi/<span class="hljs-number">255.0</span>)*<span class="hljs-number">255</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-29">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-29">&#182;</a>
+              </div>
+              <p><code>s</code> is the size of the tile we will scale it up to <em>before</em> cropping.
+The tile needs to be cropped because we originally included some buffer
+for catching all the data that might be on the edge of the tile.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    s = <span class="hljs-number">1024</span>
+    color = imresize(color, size=(s,s), interp=<span class="hljs-string">'nearest'</span>)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-30">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-30">&#182;</a>
+              </div>
+              <p>Now crop the data down to what the tile is <em>actually</em> supposed to contain
+and then scale to 256x256 pixels.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    lat_len = zi.shape[<span class="hljs-number">0</span>]*<span class="hljs-number">.0001</span>
+    lng_len = zi.shape[<span class="hljs-number">1</span>]*<span class="hljs-number">.0001</span>
+
+    x1 = ((lngs[<span class="hljs-number">0</span>]-(lngs2[<span class="hljs-number">0</span>]<span class="hljs-number">-.00005</span>))/lng_len)*s
+    x2 = s-(((lngs2[<span class="hljs-number">1</span>]+<span class="hljs-number">.00005</span>) - lngs[<span class="hljs-number">1</span>])/lng_len)*s
+
+    y1 = (((lats2[<span class="hljs-number">1</span>]+<span class="hljs-number">.00005</span>) - lats[<span class="hljs-number">1</span>])/lat_len)*s
+    y2 = s-((lats[<span class="hljs-number">0</span>]-(lats2[<span class="hljs-number">0</span>]<span class="hljs-number">-.00005</span>))/lat_len)*s
+
+    color = color[y1:y2+<span class="hljs-number">1</span>,x1:x2+<span class="hljs-number">1</span>]
+    color = imresize(color, size=(<span class="hljs-number">256</span>,<span class="hljs-number">256</span>), interp=<span class="hljs-string">'nearest'</span>)
+
+    <span class="hljs-keyword">return</span> Image.fromarray(color)</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-31">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-31">&#182;</a>
+              </div>
+              <h2 id="generategreytile">generateGreyTile</h2>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">generateGreyTile</span><span class="hljs-params">(x, y, zoom, allRecords)</span>:</span>
+    timestamp = int(time.time())
+    nw_corner = num2deg(x, y, zoom)
+    se_corner = num2deg(x+<span class="hljs-number">1</span>, y+<span class="hljs-number">1</span>, zoom)
+
+    lats = [min(nw_corner[<span class="hljs-number">0</span>], se_corner[<span class="hljs-number">0</span>]), max(nw_corner[<span class="hljs-number">0</span>], se_corner[<span class="hljs-number">0</span>])]
+    lngs = [min(nw_corner[<span class="hljs-number">1</span>], se_corner[<span class="hljs-number">1</span>]), max(nw_corner[<span class="hljs-number">1</span>], se_corner[<span class="hljs-number">1</span>])]
+
+    lats2 = np.around([lats[<span class="hljs-number">0</span>] - <span class="hljs-number">.0002</span>, lats[<span class="hljs-number">1</span>] + <span class="hljs-number">.0002</span>], decimals=<span class="hljs-number">4</span>)
+    lngs2 = np.around([lngs[<span class="hljs-number">0</span>] - <span class="hljs-number">.0002</span>, lngs[<span class="hljs-number">1</span>] + <span class="hljs-number">.0002</span>], decimals=<span class="hljs-number">4</span>)
+
+    timestamp = int(time.time())
+
+    df = allRecords[
+            (allRecords.lat &gt;= lats2[<span class="hljs-number">0</span>]) &amp;
+            (allRecords.lat &lt;= lats2[<span class="hljs-number">1</span>]) &amp;
+            (allRecords.lng &gt;= lngs2[<span class="hljs-number">0</span>]) &amp;
+            (allRecords.lng &lt;= lngs2[<span class="hljs-number">1</span>])
+        ]
+    df = df.reset_index(drop=<span class="hljs-keyword">True</span>)
+    timestamp = int(time.time())
+
+    <span class="hljs-keyword">if</span> len(df) != <span class="hljs-number">0</span>:
+
+        bins = [
+            np.arange(lngs2[<span class="hljs-number">0</span>]<span class="hljs-number">-.00005</span>, lngs2[<span class="hljs-number">1</span>]+<span class="hljs-number">.00005</span>, <span class="hljs-number">.0001</span>),
+            np.arange(lats2[<span class="hljs-number">0</span>]<span class="hljs-number">-.00005</span>, lats2[<span class="hljs-number">1</span>]+<span class="hljs-number">.00005</span>, <span class="hljs-number">.0001</span>)
+        ]
+
+        zi, xi, yi = np.histogram2d(
+            df[<span class="hljs-string">'lng'</span>], df[<span class="hljs-string">'lat'</span>],
+            bins=bins, normed=<span class="hljs-keyword">False</span>
+        )
+
+        zi = np.ma.masked_equal(zi, <span class="hljs-number">0</span>)
+        zi = ((np.clip(zi, <span class="hljs-number">-90</span>, <span class="hljs-number">-29</span>) + <span class="hljs-number">91</span>) * <span class="hljs-number">4.25</span>).astype(int)
+        zi = np.rot90(zi)
+
+        s = <span class="hljs-number">1024</span>
+
+
+        color = np.uint8(cm.gray(zi/<span class="hljs-number">225.0</span>) * <span class="hljs-number">225</span>)
+        color = imresize(color, size=(s,s), interp=<span class="hljs-string">'nearest'</span>)
+
+        lat_len = zi.shape[<span class="hljs-number">0</span>]*<span class="hljs-number">.0001</span>
+        lng_len = zi.shape[<span class="hljs-number">1</span>]*<span class="hljs-number">.0001</span>
+
+        x1 = ((lngs[<span class="hljs-number">0</span>]-(lngs2[<span class="hljs-number">0</span>]<span class="hljs-number">-.00005</span>))/lng_len)*s
+        x2 = s-(((lngs2[<span class="hljs-number">1</span>]+<span class="hljs-number">.00005</span>) - lngs[<span class="hljs-number">1</span>])/lng_len)*s
+
+        y1 = (((lats2[<span class="hljs-number">1</span>]+<span class="hljs-number">.00005</span>) - lats[<span class="hljs-number">1</span>])/lat_len)*s
+        y2 = s-((lats[<span class="hljs-number">0</span>]-(lats2[<span class="hljs-number">0</span>]<span class="hljs-number">-.00005</span>))/lat_len)*s
+
+        color = color[y1:y2+<span class="hljs-number">1</span>,x1:x2+<span class="hljs-number">1</span>]
+        color = imresize(color, size=(<span class="hljs-number">256</span>,<span class="hljs-number">256</span>), interp=<span class="hljs-string">'nearest'</span>)
+
+        <span class="hljs-keyword">return</span> Image.fromarray(color)</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

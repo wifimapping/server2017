@@ -1,0 +1,427 @@
+How to Use Wifi-pulling APIs
+============================
+
+=================
+Introduction
+=================
+
+It is straightforward to use Wifi-pulling APIs, the portal to query wifi_scan database. In general, utilizing URL and GET, simply put parameter-value pair(s) on URL to perform data retrieval to get JSON object as the return.
+
+Have a look at an **example** of how to use APIs::
+
+	http://capstone.cloudapp.net/wifipulling/?columns=lat|lng|ssid|time&ssid=nyu&startdate=12/2/2014&batch=5&timeformat=1
+	
+Explaination:
+		* capstone.cloudapp.net: the webserver hosting wifipulling project
+		* wifipulling: the Django project serving data pulling
+		* Following '?' are specified parameter-value pairs for data retrieval. See below "Wifi-pulling APIs" section for more details.
+	
+The returned **JSON** object::
+
+	[{"lat": 40.69364759, "lng": -73.98628902, "ssid": "nyu", "time": "12-02-2014 17:33:10"}, 
+	{"lat": 40.69364761, "lng": -73.98628901, "ssid": "nyu", "time": "12-02-2014 17:33:11"}, 
+	{"lat": 40.69364761, "lng": -73.98628901, "ssid": "nyu", "time": "12-02-2014 17:33:13"}, 
+	{"lat": 40.69364761, "lng": -73.98628901, "ssid": "nyu", "time": "12-02-2014 17:33:14"}, 
+	{"lat": 40.69364759, "lng": -73.98628902, "ssid": "nyu", "time": "12-02-2014 17:33:15"}]
+
+=================
+Wifi-pulling APIs
+=================
+
+APIs are used to retrieve data from wifi_scan database. APIs similar to SQL queries are provided to query, and JSON object is returned as the output. The commonly used APIs include, but not limited to, **batch**, **offset**, **columns**, **distinct**, **timeformat**, **ssid**, **startdate** and **enddate**. Here are detailed explanations of how to use APIs.
+
+----------------
+batch and offset
+----------------
+
+- batch: to specify how many data entries to retrieve
+- offest:  to specify at which location to start retrieval
+	
+*Example*
+	
+:: 
+	
+	http://capstone.cloudapp.net/wifipulling/?batch=3&offest=75
+		
+*Output* 
+
+::
+
+	[{"acc": 25.111, "ssid": "nyu", "idx": 494, "level": -72.0, "device_model": "Nexus 4", "altitude": 0.0, "droid_version": "4.2.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "cc:d5:39:27:ec:9f", "time": 1416430302546, "lat": 40.692743, "lng": -73.9862441, "app_version": "0.5", "device_mac": "40:b0:fa:c4:5d:5f", "freq": 5180.0}, 
+	{"acc": 25.111, "ssid": "nyu", "idx": 495, "level": -74.0, "device_model": "Nexus 4", "altitude": 0.0, "droid_version": "4.2.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "cc:d5:39:27:f2:4f", "time": 1416430302546, "lat": 40.692743, "lng": -73.9862441, "app_version": "0.5", "device_mac": "40:b0:fa:c4:5d:5f", "freq": 5805.0}, 
+	{"acc": 25.111, "ssid": "nyu", "idx": 496, "level": -78.0, "device_model": "Nexus 4", "altitude": 0.0, "droid_version": "4.2.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "cc:d5:39:5c:04:bf", "time": 1416430302546, "lat": 40.692743, "lng": -73.9862441, "app_version": "0.5", "device_mac": "40:b0:fa:c4:5d:5f", "freq": 5220.0}]
+
+.. note::
+	* If neither batch and nor offset is specified, return all queried results from database
+	* If offset is specified, but batch not specified, batch is by default 10
+	* If batch is specified, but offset not specified, offset is by default 0
+	* The bigger the batch is, the longer time is needed to return results
+
+-------
+columns
+-------
+
+- columns: to specify what column(s) to retrieve. Available columns (attributes) are **idx**, **lat**, **lng**, **acc**, **altitude**, **time**, **device_mac**, **app_version**, **droid_version**, **device_model**, **ssid**, **bssid**, **caps**, **level** and **freq**.
+	
+*Example* 
+
+::
+
+	http://capstone.cloudapp.net/wifipulling/?batch=5&columns=lat|lng
+		
+*Output* 
+
+::
+
+	[{"lat": 40.6927366, "lng": -73.9862345}, {"lat": 40.6927366, "lng": -73.9862345}, {"lat": 40.6927366, "lng": -73.9862345}, {"lat": 40.6927366, "lng": -73.9862345}, {"lat": 40.6927366, "lng": -73.9862345}]
+
+.. note::
+	* Columns can be any combination of attributes available, put '|' in between to seperate attributes
+	* If no column is specified, retrieve all columns
+	
+--------
+distinct
+--------
+
+- distinct=1: distinct output 
+- distinct not specified: output not distinct
+	
+*Example: distinct=1* 
+
+::
+
+	http://capstone.cloudapp.net/wifipulling/?columns=ssid&distinct=1
+		
+*Output: distinct ssids* 
+
+::
+
+	[{"ssid": "nyu"}, {"ssid": "nyu3"}, {"ssid": "nyu2"}]
+
+*Example: distinct not specified* 
+
+::
+
+	http://capstone.cloudapp.net/wifipulling/?batch=50&columns=ssid|bssid
+		
+*Output: not distinct, e.g. {"ssid": "nyu", "bssid": "cc:d5:39:27:ec:9f"}*
+
+::
+
+	[{"ssid": "nyu", "bssid": "cc:d5:39:27:f0:bf"}, {"ssid": "nyu", "bssid": "cc:d5:39:27:f2:40"}, {"ssid": "nyu", "bssid": "cc:d5:39:5c:05:a0"}, 
+	{"ssid": "nyu", "bssid": "cc:d5:39:27:ec:9f"}, {"ssid": "nyu", "bssid": "cc:d5:39:27:ec:10"}, {"ssid": "nyu", "bssid": "cc:d5:39:27:f2:4f"}, 
+	{"ssid": "nyu", "bssid": "cc:d5:39:5c:04:bf"}, {"ssid": "nyu", "bssid": "cc:d5:39:5c:05:af"}, {"ssid": "nyu", "bssid": "cc:d5:39:27:f0:bf"}, 
+	{"ssid": "nyu", "bssid": "cc:d5:39:27:ec:9f"}, {"ssid": "nyu", "bssid": "cc:d5:39:27:f2:4f"}, {"ssid": "nyu", "bssid": "cc:d5:39:5c:04:bf"}, 
+	{"ssid": "nyu", "bssid": "cc:d5:39:5c:05:af"}, {"ssid": "nyu", "bssid": "cc:d5:39:27:f0:b0"}, {"ssid": "nyu", "bssid": "cc:d5:39:27:f0:bf"}, 
+	{"ssid": "nyu", "bssid": "cc:d5:39:27:ec:9f"}, {"ssid": "nyu", "bssid": "cc:d5:39:27:f2:4f"}, {"ssid": "nyu", "bssid": "cc:d5:39:5c:04:bf"}, 
+	{"ssid": "nyu", "bssid": "cc:d5:39:5c:05:af"}, {"ssid": "nyu", "bssid": "cc:d5:39:27:f0:b0"}, {"ssid": "nyu", "bssid": "cc:d5:39:27:f0:bf"}]
+	
+.. note::
+	* Output of any combination of attributes can be distinct
+
+----------
+timeformat
+----------
+
+- timeformat=1: human-readable time returned
+- timeformat=2:  both unix time and human-readable time returned
+- timeformat not specified: unix time returned
+	
+*Example: timeformat=1* 
+
+::
+
+	http://capstone.cloudapp.net/wifipulling/?batch=5&columns=time&timeformat=1
+		
+*Output* 
+
+::
+
+	[{"time": "11-19-2014 20:23:44"}, {"time": "11-19-2014 20:23:44"}, {"time": "11-19-2014 20:23:44"}, {"time": "11-19-2014 20:23:44"}, {"time": "11-19-2014 20:23:44"}]
+
+*Example: timeformat not specified* 
+
+::
+
+	http://capstone.cloudapp.net/wifipulling/?batch=5&columns=time
+		
+*Output*
+
+::
+
+	[{"time": 1416428624717}, {"time": 1416428624717}, {"time": 1416428624717}, {"time": 1416428624717}, {"time": 1416428624717}]
+
+.. note::
+	* If timeformat=1 or 2, it takes time to return JSON object due to conversion	
+
+---
+idx
+---
+
+- idx: equal to a specified index
+	
+*Example* 
+
+::
+
+	http://capstone.cloudapp.net/wifipulling/?idx=1522403
+		
+*Output* 
+
+::
+
+	[{"acc": 39.0, "ssid": "nyu", "idx": 1522403, "level": -65.0, "device_model": "VS985 4G", "altitude": -26.0, "droid_version": "4.4.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "58:bf:ea:61:46:cf", "time": 1427740500000, "lat": 40.72940789, "lng": -73.99668307, "app_version": "0.8", "device_mac": "34:4d:f7:0e:6e:e5", "freq": 5745.0}]
+
+---
+acc
+---
+
+- acc: greater than or equal to a specified acc
+	
+*Example* 
+
+::
+
+	http://capstone.cloudapp.net/wifipulling/?acc=120
+		
+*Output* 
+
+::
+
+	[{"acc": 123.375, "ssid": "nyu", "idx": 58974, "level": -44.0, "device_model": "Nexus 4", "altitude": 0.0, "droid_version": "4.2.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "cc:d5:39:27:ef:40", "time": 1417458072221, "lat": 40.6933367, "lng": -73.9860387, "app_version": "0.8", "device_mac": "40:b0:fa:c4:5d:5f", "freq": 2412.0}, 
+	{"acc": 124.193, "ssid": "nyu", "idx": 59051, "level": -44.0, "device_model": "Nexus 4", "altitude": 0.0, "droid_version": "4.2.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "cc:d5:39:27:ef:40", "time": 1417458074834, "lat": 40.6933237, "lng": -73.986027, "app_version": "0.8", "device_mac": "40:b0:fa:c4:5d:5f", "freq": 2412.0},
+	{"acc": 125.525, "ssid": "nyu", "idx": 59165, "level": -48.0, "device_model": "Nexus 4", "altitude": 0.0, "droid_version": "4.2.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "cc:d5:39:27:ef:40", "time": 1417458077823, "lat": 40.6933503, "lng": -73.9860083, "app_version": "0.8", "device_mac": "40:b0:fa:c4:5d:5f", "freq": 2412.0}]
+
+--------
+altitude
+--------
+
+- altitude: greater than or equal to a specified altitude
+	
+*Example* 
+
+::
+
+	http://capstone.cloudapp.net/wifipulling/?altitude=110
+		
+*Output* 
+
+::
+
+	[{"acc": 43.0, "ssid": "nyu", "idx": 393654, "level": -60.0, "device_model": "Nexus 4", "altitude": 127.30000305176, "droid_version": "4.2.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "cc:d5:39:27:f0:bf", "time": 1423274436000, "lat": 40.69235262, "lng": -73.98594631, "app_version": "0.8", "device_mac": "40:b0:fa:c4:5d:5f", "freq": 5240.0}, 
+	{"acc": 43.0, "ssid": "nyu", "idx": 393656, "level": -64.0, "device_model": "Nexus 4", "altitude": 127.30000305176, "droid_version": "4.2.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "cc:d5:39:27:f0:b0", "time": 1423274436000, "lat": 40.69235262, "lng": -73.98594631, "app_version": "0.8", "device_mac": "40:b0:fa:c4:5d:5f", "freq": 2412.0}]
+	
+---------------------
+startdate and enddate
+---------------------
+
+- startdate: greater than or equal to a specified date
+- enddate: less than a specified date
+	
+*Example* 
+
+::
+
+	http://capstone.cloudapp.net/wifipulling/?startdate=12/2/2014&enddate=12/13/2014&timeformat=1
+		
+*Output* 
+
+::
+
+	[{"acc": 121.0, "ssid": "nyu", "idx": 151546, "level": -85.0, "device_model": "VS985 4G", "altitude": 0.0, "droid_version": "4.4.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "2c:3e:cf:a0:e0:ef", "time": "12-02-2014 17:33:10", "lat": 40.69364759, "lng": -73.98628902, "app_version": "0.8", "device_mac": "34:4d:f7:0e:6e:e5", "freq": 5180.0}, 
+	{"acc": 117.0, "ssid": "nyu", "idx": 384615, "level": -81.0, "device_model": "SCH-I545", "altitude": 0.0, "droid_version": "4.4.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "1c:1d:86:fd:91:50", "time": "12-12-2014 20:16:48", "lat": 40.69488021, "lng": -73.99132343, "app_version": "0.8", "device_mac": "CC:3A:61:15:D0:7A", "freq": 2412.0}]		
+	
+.. note::
+	* startdate and enddate can be used seperately, meaning startdate can be specified without enddate or enddate can be specified without startdate
+	* Acceptable date format: mm/dd/yyyy, m/dd/yyyy, mm/d/yyyy, m/d/yyyy
+
+----------
+device_mac
+----------
+
+- device_mac: equal to a specified device_mac
+	
+*Example* 
+
+::
+
+	http://capstone.cloudapp.net/wifipulling/?device_mac=34:4d:f7:0e:6e:e5
+		
+*Output* 
+
+::
+
+	[{"acc": 62.0, "ssid": "nyu", "idx": 39310, "level": -66.0, "device_model": "VS985 4G", "altitude": 0.0, "droid_version": "4.4.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "1c:1d:86:fd:52:2f", "time": 1416585772000, "lat": 40.69500339, "lng": -73.99078057, "app_version": "0.8", "device_mac": "34:4d:f7:0e:6e:e5", "freq": 5745.0}, 
+	{"acc": 16.0, "ssid": "nyu", "idx": 222835, "level": -65.0, "device_model": "VS985 4G", "altitude": 0.0, "droid_version": "4.4.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "1c:1d:86:ee:77:10", "time": 1417550570000, "lat": 40.69383247, "lng": -73.98702126, "app_version": "0.8", "device_mac": "34:4d:f7:0e:6e:e5", "freq": 2462.0}]	
+	
+-----------
+app_version
+-----------
+
+- app_version: equal to a specified app_version
+	
+*Example* 
+
+::
+
+	http://capstone.cloudapp.net/wifipulling/?app_version=0.8
+		
+*Output* 
+
+::
+
+	{"acc": 62.0, "ssid": "nyu", "idx": 39310, "level": -66.0, "device_model": "VS985 4G", "altitude": 0.0, "droid_version": "4.4.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "1c:1d:86:fd:52:2f", "time": 1416585772000, "lat": 40.69500339, "lng": -73.99078057, "app_version": "0.8", "device_mac": "34:4d:f7:0e:6e:e5", "freq": 5745.0}, 
+	{"acc": 124.221, "ssid": "nyu", "idx": 59537, "level": -75.0, "device_model": "Nexus 4", "altitude": 0.0, "droid_version": "4.2.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "cc:d5:39:27:ec:1f", "time": 1417458088523, "lat": 40.6932486, "lng": -73.9860296, "app_version": "0.8", "device_mac": "40:b0:fa:c4:5d:5f", "freq": 5765.0}]	
+	
+-------------
+droid_version
+-------------
+
+- droid_version: equal to a specified droid_version
+	
+*Example* 
+
+::
+
+	http://capstone.cloudapp.net/wifipulling/?droid_version=4.4.2
+		
+*Output* 
+
+::
+
+	[{"acc": 62.0, "ssid": "nyu", "idx": 39310, "level": -66.0, "device_model": "VS985 4G", "altitude": 0.0, "droid_version": "4.4.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "1c:1d:86:fd:52:2f", "time": 1416585772000, "lat": 40.69500339, "lng": -73.99078057, "app_version": "0.8", "device_mac": "34:4d:f7:0e:6e:e5", "freq": 5745.0}, 
+	{"acc": 34.0, "ssid": "nyu", "idx": 207761, "level": -65.0, "device_model": "VS985 4G", "altitude": 0.0, "droid_version": "4.4.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "1c:1d:86:ee:77:10", "time": 1417550448000, "lat": 40.69470769, "lng": -73.98743707, "app_version": "0.8", "device_mac": "34:4d:f7:0e:6e:e5", "freq": 2462.0}]	
+		
+------------
+device_model
+------------
+
+- device_model: equal to a specified device_model
+	
+*Example* 
+
+::
+
+	http://capstone.cloudapp.net/wifipulling/?device_model=VS985 3G
+		
+*Output* 
+
+::
+
+	[{"acc": 44.0, "ssid": "nyu2", "idx": 1522562, "level": -85.0, "device_model": "VS985 3G", "altitude": -26.0, "droid_version": "4.4.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "58:bf:ea:60:a0:7f", "time": 1427740501000, "lat": 40.72940166, "lng": -73.99668509, "app_version": "0.8", "device_mac": "34:4d:f7:0e:6e:e5", "freq": 5180.0}] 
+		
+----
+ssid
+----
+
+- single ssid: equal to a specified ssid
+- multi ssids:  filter multi ssids, put '|' in between to seperate ssids
+	
+*Example: single ssid* 
+
+::
+
+	http://capstone.cloudapp.net/wifipulling/?ssid=nyu
+		
+*Output* 
+
+::
+
+	[{"acc": 24.948, "ssid": "nyu", "idx": 2, "level": -49.0, "device_model": "Nexus 4", "altitude": 0.0, "droid_version": "4.2.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "cc:d5:39:27:f0:bf", "time": 1416428624717, "lat": 40.6927366, "lng": -73.9862345, "app_version": "0.5", "device_mac": "40:b0:fa:c4:5d:5f", "freq": 5240.0},
+	{"acc": 24.949, "ssid": "nyu", "idx": 613, "level": -45.0, "device_model": "Nexus 4", "altitude": 0.0, "droid_version": "4.2.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "cc:d5:39:27:f0:b0", "time": 1416430306671, "lat": 40.6927404, "lng": -73.9862428, "app_version": "0.5", "device_mac": "40:b0:fa:c4:5d:5f", "freq": 2462.0}]
+
+*Example: multi ssids* 
+
+::
+
+	http://capstone.cloudapp.net/wifipulling/?ssid=nyu|nyu2|nyu3
+		
+*Output*
+
+::
+
+	[{"acc": 24.948, "ssid": "nyu", "idx": 2, "level": -49.0, "device_model": "Nexus 4", "altitude": 0.0, "droid_version": "4.2.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "cc:d5:39:27:f0:bf", "time": 1416428624717, "lat": 40.6927366, "lng": -73.9862345, "app_version": "0.5", "device_mac": "40:b0:fa:c4:5d:5f", "freq": 5240.0},
+	{"acc": 14.0, "ssid": "nyu3", "idx": 1522535, "level": -78.0, "device_model": "VS985 4G", "altitude": -26.0, "droid_version": "4.4.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "58:bf:ea:41:0e:7f", "time": 1427740501000, "lat": 40.72940166, "lng": -73.99668509, "app_version": "0.8", "device_mac": "34:4d:f7:0e:6e:e5", "freq": 5745.0}, 
+	{"acc": 44.0, "ssid": "nyu3", "idx": 1522559, "level": -79.0, "device_model": "VS985 4G", "altitude": -26.0, "droid_version": "4.4.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "58:bf:ea:76:34:8f", "time": 1427740501000, "lat": 40.72940166, "lng": -73.99668509, "app_version": "0.8", "device_mac": "34:4d:f7:0e:6e:e5", "freq": 5785.0}, 
+	{"acc": 44.0, "ssid": "nyu2", "idx": 1522562, "level": -85.0, "device_model": "VS985 3G", "altitude": -26.0, "droid_version": "4.4.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "58:bf:ea:60:a0:7f", "time": 1427740501000, "lat": 40.72940166, "lng": -73.99668509, "app_version": "0.8", "device_mac": "34:4d:f7:0e:6e:e5", "freq": 5180.0}]
+
+-----
+bssid
+-----
+
+- bssid: equal to a specified bssid
+	
+*Example* 
+
+::
+
+	http://capstone.cloudapp.net/wifipulling/?bssid=d8:24:bd:59:d5:7f
+		
+*Output* 
+
+::
+
+	[{"acc": 14.0, "ssid": "nyu", "idx": 436210, "level": -79.0, "device_model": "VS985 4G", "altitude": -10.0, "droid_version": "4.4.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "d8:24:bd:59:d5:7f", "time": 1424289829000, "lat": 40.72947996, "lng": -73.99665075, "app_version": "0.8", "device_mac": "34:4d:f7:0e:6e:e5", "freq": 5180.0}, 
+	{"acc": 16.0, "ssid": "nyu", "idx": 970322, "level": -86.0, "device_model": "VS985 4G", "altitude": 9.0, "droid_version": "4.4.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "d8:24:bd:59:d5:7f", "time": 1425335280000, "lat": 40.72989395, "lng": -73.99659445, "app_version": "0.8", "device_mac": "34:4d:f7:0e:6e:e5", "freq": 5180.0}] 
+
+----
+caps
+----
+
+- caps: contains a given string
+	
+*Example* 
+
+::
+
+	http://capstone.cloudapp.net/wifipulling/?caps=WPA
+		
+*Output* 
+
+::
+
+	[{"acc": 24.948, "ssid": "nyu", "idx": 2, "level": -49.0, "device_model": "Nexus 4", "altitude": 0.0, "droid_version": "4.2.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "cc:d5:39:27:f0:bf", "time": 1416428624717, "lat": 40.6927366, "lng": -73.9862345, "app_version": "0.5", "device_mac": "40:b0:fa:c4:5d:5f", "freq": 5240.0}, 
+	{"acc": 27.277, "ssid": "nyu", "idx": 821, "level": -50.0, "device_model": "Nexus 4", "altitude": 0.0, "droid_version": "4.2.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "cc:d5:39:27:f0:bf", "time": 1416430319531, "lat": 40.6927572, "lng": -73.9862154, "app_version": "0.5", "device_mac": "40:b0:fa:c4:5d:5f", "freq": 5240.0}] 
+		
+-----
+level
+-----
+
+- level: greater than or equal to a specified level
+	
+*Example* 
+
+::
+
+	http://capstone.cloudapp.net/wifipulling/?level=-50
+		
+*Output* 
+
+::
+
+	[{"acc": 24.948, "ssid": "nyu", "idx": 2, "level": -49.0, "device_model": "Nexus 4", "altitude": 0.0, "droid_version": "4.2.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "cc:d5:39:27:f0:bf", "time": 1416428624717, "lat": 40.6927366, "lng": -73.9862345, "app_version": "0.5", "device_mac": "40:b0:fa:c4:5d:5f", "freq": 5240.0},
+	{"acc": 24.965, "ssid": "nyu", "idx": 203, "level": -46.0, "device_model": "Nexus 4", "altitude": 0.0, "droid_version": "4.2.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "cc:d5:39:27:f0:b0", "time": 1416430285399, "lat": 40.6927406, "lng": -73.9862428, "app_version": "0.5", "device_mac": "40:b0:fa:c4:5d:5f", "freq": 2462.0}] 
+
+----
+freq
+----
+
+- freq: equal to a specified freq
+	
+*Example* 
+
+::
+
+	http://capstone.cloudapp.net/wifipulling/?freq=5180
+		
+*Output* 
+
+::
+
+	[{"acc": 24.948, "ssid": "nyu", "idx": 5, "level": -72.0, "device_model": "Nexus 4", "altitude": 0.0, "droid_version": "4.2.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "cc:d5:39:27:ec:9f", "time": 1416428624717, "lat": 40.6927366, "lng": -73.9862345, "app_version": "0.5", "device_mac": "40:b0:fa:c4:5d:5f", "freq": 5180.0},
+	{"acc": 26.0, "ssid": "nyu", "idx": 387355, "level": -75.0, "device_model": "Nexus 4", "altitude": 106.0, "droid_version": "4.2.2", "caps": "[WPA-EAP-TKIP][WPA2-EAP-CCMP][ESS]", "bssid": "cc:d5:39:27:ec:9f", "time": 1423250621000, "lat": 40.69292831, "lng": -73.98620717, "app_version": "0.8", "device_mac": "40:b0:fa:c4:5d:5f", "freq": 5180.0}]		
+		
+		
+		
+	
+		
